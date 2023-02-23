@@ -1,0 +1,38 @@
+name: Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Direct URL to file"
+        required: true
+      args:
+        description: "Conversion args"
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Convert File to YouTube
+        run: |
+          sudo apt update
+          sudo apt install -y git libopencv-dev clang libclang-dev libssl-dev
+
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          
+          git clone https://github.com/DvorakDwarf/Infinite-Storage-Glitch.git
+          cd Infinite-Storage-Glitch/
+          cargo build --release
+          cd target/release/
+          wget "${{ github.event.inputs.url }}" -o "file"
+          ./isg_4real embed -p optimal -i file --block-size 2 --mode binary --threads 8 --fps 10 --resolution 720p
+          mv output.avi ${{ github.workspace }}/output.avi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: file
+          path: ${{ github.workspace }}/output.avi
