@@ -3,8 +3,11 @@ name: Run
 on:
   workflow_dispatch:
     inputs:
-      deb:
-        description: "Direct URL to deb file"
+      url:
+        description: "Direct URL to file"
+        required: true
+      ending:
+        description: "Fileending"
         required: true
 
 jobs:
@@ -12,19 +15,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Convert deb to IPA
+      - name: Convert YouTube to File
         run: |
-          curl -L -o ${{ github.workspace }}/app.deb "${{ github.event.inputs.deb }}"
-          dpkg-deb -X ${{ github.workspace }}/app.deb ${{ github.workspace }}/app
+          sudo apt update
+          sudo apt install -y git libopencv-dev clang libclang-dev libssl-dev
 
-          mkdir -p ${{ github.workspace }}/ipa/Payload
-          cp -R ${{ github.workspace }}/app/Applications/* ${{ github.workspace }}/ipa/Payload
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+          source "$HOME/.cargo/env"
           
-          cd ${{ github.workspace }}/ipa
-          zip -r ${{ github.workspace }}/App.ipa .
+          git clone https://github.com/DvorakDwarf/Infinite-Storage-Glitch.git
+          cd Infinite-Storage-Glitch/
+          cargo build --release
+          cd /target/release/
+          ./isg_4real download -u "${{ github.event.inputs.url }}"
+          mv *.mp4 file.mp4
+          
+          ./isg_4real dislodge -i file.mp4 -o file"${{ github.event.inputs.ending }}"
+          
+          cp file"${{ github.event.inputs.ending }}" ${{ github.workspace }}/file"${{ github.event.inputs.ending }}"
+          
 
-      - name: Upload IPA
-        uses: actions/upload-artifact@v3.1.0
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
         with:
-          name: App
-          path: ${{ github.workspace }}/App.ipa
+          name: file
+          path: ${{ github.workspace }}/file"${{ github.event.inputs.ending }}"
