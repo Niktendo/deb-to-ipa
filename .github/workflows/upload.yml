@@ -28,7 +28,7 @@ jobs:
           cargo build --release
           cd target/release/
           wget "${{ github.event.inputs.url }}" -o "file"
-          ./isg_4real embed ${{ github.event.inputs.args }}
+          ./isg_4real embed -i file ${{ github.event.inputs.args }}
           mv output.avi ${{ github.workspace }}/output.avi
 
       - name: Upload artifact
