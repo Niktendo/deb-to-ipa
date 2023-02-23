@@ -30,9 +30,7 @@ jobs:
           ./isg_4real download -u "${{ github.event.inputs.url }}"
           mv *.mp4 file.mp4
           
-          ./isg_4real dislodge -i file.mp4 -o file"${{ github.event.inputs.ending }}"
-          
-          cp file"${{ github.event.inputs.ending }}" ${{ github.workspace }}/file"${{ github.event.inputs.ending }}"
+          ./isg_4real dislodge -i file.mp4 -o ${{ github.workspace }}/file"${{ github.event.inputs.ending }}"
           
 
       - name: Upload artifact
