@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Convert YouTube to File
         run: |
+          ls -la /home/runner/work/
           sudo apt update
           sudo apt install -y git libopencv-dev clang libclang-dev libssl-dev
 
@@ -30,11 +31,11 @@ jobs:
           ./isg_4real download -u "${{ github.event.inputs.url }}"
           mv *.mp4 file.mp4
           
-          ./isg_4real dislodge -i file.mp4 -o ${{ github.workspace }}/file"${{ github.event.inputs.ending }}"
+          ./isg_4real dislodge -i file.mp4 -o ${{ github.workspace }}/file${{ github.event.inputs.ending }}
           
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.2
         with:
           name: file
-          path: ${{ github.workspace }}/file"${{ github.event.inputs.ending }}"
+          path: ${{ github.workspace }}/file${{ github.event.inputs.ending }}
